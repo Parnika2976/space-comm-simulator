@@ -82,9 +82,9 @@ void viewqueue()
     return;
   }
   printf("Current queue\n");
-  for(i = front; i < rear; i = (i+1)%SIZE)
-      printf("Packet ID: %d | Type: %s | Status: %s | Data: %s\n", queue[i].id, queue[i].type, queue[i].status, queue[i].data);
-  printf("Packet ID: %d | Type: %s | Status: %s | Data: %s\n", queue[i].id, queue[i].type, queue[i].status, queue[i].data);
+  for(i = front; i != rear; i = (i+1)%SIZE)
+      printf("Packet ID: %d | Type: %s | Status: %s | Data: %s\n", queue[i].id, queue[i].type, (queue[i].status == 1) ? "SENT" : (queue[i].status == -1) ? "LOST" : "WAITING", queue[i].data);
+  printf("Packet ID: %d | Type: %s | Status: %s | Data: %s\n", queue[i].id, queue[i].type, (queue[i].status == 1) ? "SENT" : (queue[i].status == -1) ? "LOST" : "WAITING", queue[i].data);
   printf("End of queue\n");
 }
 
