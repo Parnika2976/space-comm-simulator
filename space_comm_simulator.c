@@ -75,13 +75,13 @@ void sendpacket()
 
 void viewqueue()
 {
-  int i;
   if(front == -1)
   {
     printf("The queue is empty. No packets to display.\n");
     return;
   }
   printf("Current queue\n");
+  int i;
   for(i = front; i != rear; i = (i+1)%SIZE)
       printf("Packet ID: %d | Type: %s | Status: %s | Data: %s\n", queue[i].id, queue[i].type, (queue[i].status == 1) ? "SENT" : (queue[i].status == -1) ? "LOST" : "WAITING", queue[i].data);
   printf("Packet ID: %d | Type: %s | Status: %s | Data: %s\n", queue[i].id, queue[i].type, (queue[i].status == 1) ? "SENT" : (queue[i].status == -1) ? "LOST" : "WAITING", queue[i].data);
