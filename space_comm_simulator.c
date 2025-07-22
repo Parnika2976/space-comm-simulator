@@ -34,7 +34,7 @@ void createpacket()
   newpacket.status = 0; //waiting
 
   if(front == -1)
-    front = 0;
+    front = rear = 0;
   else
     rear = (rear+1)%SIZE;
   queue[rear] = newpacket;
@@ -51,22 +51,25 @@ void sendpacket()
   struct packet current = queue[front];
   //Simulate transmission...assuming 80% success
   int chance = rand()%100;
-  if (chance<80)
-  {
-    current.status = 1; //sent
-    printf("Packet ID %d is sent successfully.\n", current.id);
-  } 
+  if (chance < 80)
+    {
+        queue[front].status = 1;
+        printf("Packet ID %d is sent successfully.\n", queue[front].id);
+    }
   else
-  {
-    current.status = -1; //lost
-    printf("Packet ID %d is lost.\n", current.id);
-  }
+    {
+        queue[front].status = -1;
+        printf("Packet ID %d is lost.\n", queue[front].id);
+    }
+
   FILE *fp = fopen("spacelog.txt", "a");
   if(fp == NULL)
     printf("Sorry! Error occured while opening the log file.\n");
   else
   {
-    fprintf(fp, "Packet ID: %d | Type: %s | Status: %s | Data: %s\n", current.id, current.type, (current.status==1)?"SENT":"LOST", current.data);
+    fprintf(fp, "Packet ID: %d | Type: %s | Status: %s | Data: %s\n", queue[front].id, queue[front].type,
+        (queue[front].status == 1) ? "SENT" : "LOST",
+        queue[front].data);
     fclose(fp);
   }
   if(front == rear)  front = rear = -1;
@@ -75,17 +78,24 @@ void sendpacket()
 
 void viewqueue()
 {
-  if(front == -1)
-  {
-    printf("The queue is empty. No packets to display.\n");
-    return;
-  }
-  printf("Current queue\n");
-  int i;
-  for(i = front; i != rear; i = (i+1)%SIZE)
-      printf("Packet ID: %d | Type: %s | Status: %s | Data: %s\n", queue[i].id, queue[i].type, (queue[i].status == 1) ? "SENT" : (queue[i].status == -1) ? "LOST" : "WAITING", queue[i].data);
-  printf("Packet ID: %d | Type: %s | Status: %s | Data: %s\n", queue[i].id, queue[i].type, (queue[i].status == 1) ? "SENT" : (queue[i].status == -1) ? "LOST" : "WAITING", queue[i].data);
-  printf("End of queue\n");
+    if (front == -1)
+    {
+        printf("The queue is empty. No packets to display.\n");
+        return;
+    }
+    printf("Current queue:\n");
+    int i = front;
+    while (1)
+    {
+        printf("Packet ID: %d | Type: %s | Status: %s | Data: %s\n",
+               queue[i].id, queue[i].type,
+               (queue[i].status == 1) ? "SENT" : (queue[i].status == -1) ? "LOST" : "WAITING",
+               queue[i].data);
+        if (i == rear)
+            break;
+        i = (i + 1) % SIZE;
+    }
+    printf("End of queue\n");
 }
 
 void viewlog()
@@ -119,7 +129,16 @@ void viewlog()
       printf("4. View Log\n");
       printf("5. Exit\n");
       printf("Enter your choice: ");
-      scanf("%d", &choice);
+      if (scanf("%d", &choice) != 1) {
+    printf("Invalid input. Please enter a number.\n");
+
+    // Flush buffer completely
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
+
+    continue;
+}
+
       switch(choice)
         {
           case 1: createpacket();  break;
